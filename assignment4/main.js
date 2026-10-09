@@ -47,19 +47,26 @@ function renderTasks() {
 
 async function loadTasks() {
   statusMessage.textContent = "Loading tasks...";
+  loadTasksBtn.disabled = true;
 
-  const rawTasks = await fetchTasks();
+  try {
+    const rawTasks = await fetchTasks();
 
-  const json = JSON.stringify(rawTasks);
-  const parsedTasks = JSON.parse(json);
+    const json = JSON.stringify(rawTasks);
+    const parsedTasks = JSON.parse(json);
 
-  const tasks = parsedTasks.map(
-    (item) => new Task(item.id, item.title, item.completed)
-  );
+    const tasks = parsedTasks.map(
+      (item) => new Task(item.id, item.title, item.completed)
+    );
 
-  taskManager.setTasks(tasks);
-  renderTasks();
-  statusMessage.textContent = "";
+    taskManager.setTasks(tasks);
+    renderTasks();
+    statusMessage.textContent = "";
+  } catch (error) {
+    statusMessage.textContent = `Failed to load tasks: ${error.message}`;
+  } finally {
+    loadTasksBtn.disabled = false;
+  }
 }
 
 loadTasksBtn.addEventListener("click", loadTasks);
